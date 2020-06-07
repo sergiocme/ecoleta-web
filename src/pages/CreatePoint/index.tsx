@@ -46,6 +46,7 @@ const CreatePoint: React.FC = () => {
   const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>();
   const [initialPosition, setInitialPosition] = useState<[number, number] | null>();
   const [formData, setFormData] = useState<FormData>({} as FormData);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -95,6 +96,15 @@ const CreatePoint: React.FC = () => {
 
   const handleOnInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
+  }
+
+  const handleSelectedItem = (itemId: number) => {
+    const itemIdIndex = selectedItems.indexOf(itemId);
+    if (itemIdIndex > -1) {
+      setSelectedItems(selectedItems.filter((item) => item !== selectedItems[itemIdIndex]));
+    } else {
+      setSelectedItems([ ...selectedItems, itemId ]);
+    }
   }
 
   return (
@@ -197,9 +207,13 @@ const CreatePoint: React.FC = () => {
 
           <ul className="items-grid">
             {items.map((item: Item) => (
-              <li key={item.id}>
+              <li
+                key={item.id}
+                onClick={() => handleSelectedItem(item.id)}
+                className={selectedItems.includes(item.id) ? 'selected' : ''}
+              >
                 <img alt={item.name} src={item.image_icon_url} />
-                <span className="capitalize">{item.name}</span>
+                <span>{item.name}</span>
               </li>
             ))}
           </ul>
