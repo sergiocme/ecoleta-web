@@ -1,6 +1,7 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Map, TileLayer, Marker } from 'react-leaflet';
+import { LeafletMouseEvent } from 'leaflet';
 import axios from 'axios';
 import { FiArrowLeft } from 'react-icons/fi';
 import './styles.css';
@@ -36,6 +37,7 @@ const CreatePoint: React.FC = () => {
   const [selectedFederalUnit, setSelectedFederalUnit] = useState('0');
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState('0');
+  const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>();
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -70,6 +72,10 @@ const CreatePoint: React.FC = () => {
 
   const handleSelectedCity = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedCity(event.target.value);
+  }
+
+  const handleMapClick = (event: LeafletMouseEvent) => {
+    setSelectedPosition([event.latlng.lat, event.latlng.lng]);
   }
 
   return (
@@ -125,13 +131,13 @@ const CreatePoint: React.FC = () => {
             <span>Selecione o endereço no mapa</span>
           </legend>
 
-          <Map center={[-22.9290858, -47.263071]} zoom={15}>
+          <Map center={[-22.9290858, -47.263071]} zoom={15} onClick={handleMapClick}>
             <TileLayer
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <Marker position={[-22.9290858, -47.263071]} />
+            <Marker position={selectedPosition ? selectedPosition : [0, 0]} />
           </Map>
 
           <div className="field-group">
