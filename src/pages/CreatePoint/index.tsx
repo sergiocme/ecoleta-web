@@ -31,6 +31,12 @@ interface IBGE_CityData {
   nome: string;
 }
 
+interface FormData {
+  name: string;
+  email: string;
+  whatsapp: string;
+}
+
 const CreatePoint: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [federalStates, setFederalStates] = useState<string[]>([]);
@@ -39,6 +45,7 @@ const CreatePoint: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>();
   const [initialPosition, setInitialPosition] = useState<[number, number] | null>();
+  const [formData, setFormData] = useState<FormData>({} as FormData);
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -86,6 +93,10 @@ const CreatePoint: React.FC = () => {
     setSelectedPosition([event.latlng.lat, event.latlng.lng]);
   }
 
+  const handleOnInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
+  }
+
   return (
     <div id="page-create-point">
       <header>
@@ -109,6 +120,7 @@ const CreatePoint: React.FC = () => {
               id="name"
               name="name"
               type="text"
+              onChange={handleOnInputChange}
             />
           </div>
 
@@ -119,6 +131,7 @@ const CreatePoint: React.FC = () => {
                 id="email"
                 name="email"
                 type="email"
+                onChange={handleOnInputChange}
               />
             </div>
 
@@ -128,6 +141,7 @@ const CreatePoint: React.FC = () => {
                 id="whatsapp"
                 name="whatsapp"
                 type="text"
+                onChange={handleOnInputChange}
               />
             </div>
           </div>
