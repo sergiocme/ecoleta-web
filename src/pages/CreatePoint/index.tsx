@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import { FiArrowLeft } from 'react-icons/fi';
 import './styles.css';
 
+import api from '../../services/api';
+
 import logo from '../../assets/logo.svg';
 
+interface Item {
+  id: number;
+  name: string;
+  image_icon_url: string;
+}
+
 const CreatePoint: React.FC = () => {
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    api.get('items').then((response) => {
+      setItems(response.data);
+    });
+  }, []);
+
   return (
     <div id="page-create-point">
       <header>
@@ -93,35 +109,12 @@ const CreatePoint: React.FC = () => {
           </legend>
 
           <ul className="items-grid">
-            <li>
-              <img alt="Oil" src="http://localhost:3333/assets/oil.svg"/>
-              <span>Óleo de Cozinha</span>
-            </li>
-
-            <li>
-              <img alt="Oil" src="http://localhost:3333/assets/oil.svg"/>
-              <span>Óleo de Cozinha</span>
-            </li>
-
-            <li>
-              <img alt="Oil" src="http://localhost:3333/assets/oil.svg"/>
-              <span>Óleo de Cozinha</span>
-            </li>
-
-            <li>
-              <img alt="Oil" src="http://localhost:3333/assets/oil.svg"/>
-              <span>Óleo de Cozinha</span>
-            </li>
-
-            <li>
-              <img alt="Oil" src="http://localhost:3333/assets/oil.svg"/>
-              <span>Óleo de Cozinha</span>
-            </li>
-
-            <li>
-              <img alt="Oil" src="http://localhost:3333/assets/oil.svg"/>
-              <span>Óleo de Cozinha</span>
-            </li>
+            {items.map((item: Item) => (
+              <li key={item.id}>
+                <img alt={item.name} src={item.image_icon_url} />
+                <span className="capitalize">{item.name}</span>
+              </li>
+            ))}
           </ul>
         </fieldset>
 

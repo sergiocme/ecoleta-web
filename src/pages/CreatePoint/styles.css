@@ -1,3 +1,7 @@
+.capitalize {
+  text-transform: capitalize;
+}
+
 #page-create-point {
   width: 100%;
   max-width: 1100px;
