@@ -35,6 +35,7 @@ const CreatePoint: React.FC = () => {
   const [federalStates, setFederalStates] = useState<string[]>([]);
   const [selectedFederalUnit, setSelectedFederalUnit] = useState('0');
   const [cities, setCities] = useState<City[]>([]);
+  const [selectedCity, setSelectedCity] = useState('0');
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -65,6 +66,10 @@ const CreatePoint: React.FC = () => {
   const handleSelectedFederalUnit = (event: ChangeEvent<HTMLSelectElement>) => {
     const unit = event.target.value;
     setSelectedFederalUnit(unit);
+  }
+
+  const handleSelectedCity = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCity(event.target.value);
   }
 
   return (
@@ -142,7 +147,7 @@ const CreatePoint: React.FC = () => {
 
             <div className="field">
               <label htmlFor="city">Cidade</label>
-              <select name="city" id="city">
+              <select name="city" id="city" value={selectedCity} onChange={handleSelectedCity}>
                 <option value="0">Selecione uma cidade</option>
                 {cities.map((city) => (
                   <option key={city.id} value={city.name}>{city.name}</option>
