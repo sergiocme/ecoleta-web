@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
@@ -15,14 +15,26 @@ interface Item {
   image_icon_url: string;
 }
 
-interface ibgeFederalUnitData {
+interface IBGE_FederalUnitData {
   sigla: string;
+  nome: string;
+}
+
+interface City {
+  id: number;
+  name: string;
+}
+
+interface IBGE_CityData {
+  id: number;
   nome: string;
 }
 
 const CreatePoint: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [federalStates, setFederalStates] = useState<string[]>([]);
+  const [selectedFederalUnit, setSelectedFederalUnit] = useState('0');
+  const [cities, setCities] = useState<City[]>([]);
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -31,13 +43,29 @@ const CreatePoint: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    axios.get<ibgeFederalUnitData[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+    axios.get<IBGE_FederalUnitData[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
       .then(({ data: ibgeFederalUnits }) => {
         const federalUnitInitials = ibgeFederalUnits.map((unit) => unit.sigla);
 
         setFederalStates(federalUnitInitials);
       });
   }, []);
+
+  useEffect(() => {
+    if (selectedFederalUnit === '0') return;
+    axios.get<IBGE_CityData[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedFederalUnit}/municipios`)
+      .then(({ data: ibgeCities }) => {
+        setCities(ibgeCities.map((city) => ({
+          id: city.id,
+          name: city.nome,
+        })));
+      });
+  }, [selectedFederalUnit]);
+
+  const handleSelectedFederalUnit = (event: ChangeEvent<HTMLSelectElement>) => {
+    const unit = event.target.value;
+    setSelectedFederalUnit(unit);
+  }
 
   return (
     <div id="page-create-point">
@@ -104,7 +132,7 @@ const CreatePoint: React.FC = () => {
           <div className="field-group">
             <div className="field">
               <label htmlFor="uf">Estado (UF)</label>
-              <select name="uf" id="uf">
+              <select name="uf" id="uf" value={selectedFederalUnit} onChange={handleSelectedFederalUnit}>
                 <option value="0">Selecione uma UF</option>
                 {federalStates.map((federalState) => (
                   <option key={federalState} value={federalState}>{federalState}</option>
@@ -116,6 +144,9 @@ const CreatePoint: React.FC = () => {
               <label htmlFor="city">Cidade</label>
               <select name="city" id="city">
                 <option value="0">Selecione uma cidade</option>
+                {cities.map((city) => (
+                  <option key={city.id} value={city.name}>{city.name}</option>
+                ))}
               </select>
             </div>
           </div>
