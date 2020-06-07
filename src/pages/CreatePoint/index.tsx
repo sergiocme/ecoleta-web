@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Map, TileLayer, Marker } from 'react-leaflet';
+import axios from 'axios';
 import { FiArrowLeft } from 'react-icons/fi';
 import './styles.css';
 
@@ -14,13 +15,28 @@ interface Item {
   image_icon_url: string;
 }
 
+interface ibgeFederalUnitData {
+  sigla: string;
+  nome: string;
+}
+
 const CreatePoint: React.FC = () => {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [federalStates, setFederalStates] = useState<string[]>([]);
 
   useEffect(() => {
     api.get('items').then((response) => {
       setItems(response.data);
     });
+  }, []);
+
+  useEffect(() => {
+    axios.get<ibgeFederalUnitData[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+      .then(({ data: ibgeFederalUnits }) => {
+        const federalUnitInitials = ibgeFederalUnits.map((unit) => unit.sigla);
+
+        setFederalStates(federalUnitInitials);
+      });
   }, []);
 
   return (
@@ -90,6 +106,9 @@ const CreatePoint: React.FC = () => {
               <label htmlFor="uf">Estado (UF)</label>
               <select name="uf" id="uf">
                 <option value="0">Selecione uma UF</option>
+                {federalStates.map((federalState) => (
+                  <option key={federalState} value={federalState}>{federalState}</option>
+                ))}
               </select>
             </div>
 
