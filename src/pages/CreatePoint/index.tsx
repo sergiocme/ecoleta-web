@@ -38,6 +38,7 @@ const CreatePoint: React.FC = () => {
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>();
+  const [initialPosition, setInitialPosition] = useState<[number, number] | null>();
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -64,6 +65,13 @@ const CreatePoint: React.FC = () => {
         })));
       });
   }, [selectedFederalUnit]);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      setInitialPosition([latitude, longitude]);
+    });
+  });
 
   const handleSelectedFederalUnit = (event: ChangeEvent<HTMLSelectElement>) => {
     const unit = event.target.value;
@@ -131,7 +139,11 @@ const CreatePoint: React.FC = () => {
             <span>Selecione o endereço no mapa</span>
           </legend>
 
-          <Map center={[-22.9290858, -47.263071]} zoom={15} onClick={handleMapClick}>
+          <Map
+            center={initialPosition ? initialPosition : [-13.662969, -69.6444204]}
+            zoom={initialPosition ? 15 : 3.2}
+            onClick={handleMapClick}
+          >
             <TileLayer
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
