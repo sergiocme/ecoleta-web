@@ -1,5 +1,5 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet';
 import axios from 'axios';
@@ -47,6 +47,7 @@ const CreatePoint: React.FC = () => {
   const [initialPosition, setInitialPosition] = useState<[number, number] | null>();
   const [formData, setFormData] = useState<FormData>({} as FormData);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const history = useHistory();
 
   useEffect(() => {
     api.get('items').then((response) => {
@@ -107,6 +108,23 @@ const CreatePoint: React.FC = () => {
     }
   }
 
+  const handleOnSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
+    await api.post('/points', {
+      name: formData.name,
+      email: formData.email,
+      whatsapp: formData.whatsapp,
+      geolocation: selectedPosition?.toString(),
+      postal_address: "00",
+      city: selectedCity,
+      federal_state: selectedFederalUnit,
+      items: selectedItems,
+    });
+
+    history.push('/');
+  }
+
   return (
     <div id="page-create-point">
       <header>
@@ -118,7 +136,7 @@ const CreatePoint: React.FC = () => {
         </Link>
       </header>
 
-      <form>
+      <form onSubmit={handleOnSubmit}>
         <h1>Cadastro do <br/> ponto de coleta</h1>
 
         <fieldset>
