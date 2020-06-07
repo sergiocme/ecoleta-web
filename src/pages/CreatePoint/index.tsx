@@ -47,7 +47,7 @@ const CreatePoint: React.FC = () => {
       .then(({ data: ibgeFederalUnits }) => {
         const federalUnitInitials = ibgeFederalUnits.map((unit) => unit.sigla);
 
-        setFederalStates(federalUnitInitials);
+        setFederalStates(federalUnitInitials.sort((unit_one, unit_two) => unit_one.localeCompare(unit_two)));
       });
   }, []);
 
